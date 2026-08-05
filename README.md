@@ -56,8 +56,8 @@ To run this application natively on your local machine:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/ITomPoland/portfolio-itom.git
-   cd portfolio-itom
+   git clone https://github.com/tamilarasan-1912/Portfolio.git
+   cd portfolio
    ```
 
 2. **Install dependencies:**
