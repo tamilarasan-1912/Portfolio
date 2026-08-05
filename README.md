@@ -92,4 +92,4 @@ The code in this repository is licensed under the [MIT License](LICENSE).
 
 ---
 
-*Designed and Developed by [Tomasz Szmajda (ITom Dev)](https://itomdev.com).*
+*Designed and Developed by [A.Tamilarasan}*
