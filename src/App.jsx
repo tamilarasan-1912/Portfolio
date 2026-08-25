@@ -1,6 +1,6 @@
 import { useState, Suspense, useEffect, useCallback, lazy } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Preload, PerformanceMonitor } from '@react-three/drei';
+import { PerformanceMonitor } from '@react-three/drei';
 import Preloader from './components/dom/Preloader';
 import PaperTransition from './components/dom/PaperTransition';
 import { AudioProvider, useAudio } from './context/AudioManager';
@@ -111,7 +111,6 @@ function AppContent() {
                   onSceneReady={handleSceneReady}
                   performanceTier={tier}
                 />
-                <Preload all />
               </Suspense>
             </Canvas>
           </div>
