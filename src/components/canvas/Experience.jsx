@@ -14,12 +14,8 @@ const ENTRANCE_DOORS_Z = 22;
 /**
  * Main 3D experience.
  *
- * The original template eagerly imported and mounted every room during startup
- * through RoomWarmup. That makes the initial bundle much heavier and can crash
- * some browsers/WebGL drivers before the portfolio becomes visible.
- *
- * Rooms are now loaded only when the user enters them. The corridor and
- * entrance remain available immediately.
+ * Rooms are loaded only when the user enters them. The corridor and entrance
+ * remain available immediately.
  */
 const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
     const {
@@ -41,16 +37,16 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
         parallaxEnabled: hasEntered && !isTeleporting && !isInRoom,
     });
 
-    // The warm-up system from the original template has been removed. Signal
-    // scene readiness after the first mounted frame instead of compiling all
-    // rooms and shaders before the user can see the portfolio.
+    // Signal readiness after the Experience has actually mounted.
+    // Previously this waited for isLoaded, while isLoaded itself depended on
+    // the preloader completing, creating a circular dependency that left the
+    // production site permanently stuck at 90%.
     useEffect(() => {
-        if (!isLoaded) return;
         const frame = requestAnimationFrame(() => {
             onSceneReady?.();
         });
         return () => cancelAnimationFrame(frame);
-    }, [isLoaded, onSceneReady]);
+    }, [onSceneReady]);
 
     const handleEntranceComplete = useCallback(() => {
         markEntered();
