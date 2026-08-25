@@ -10,40 +10,27 @@ const buildTearPoints = () => {
   return points;
 };
 
-const Preloader = ({ onComplete, ready }) => {
+const Preloader = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
   const leftRef = useRef(null);
   const rightRef = useRef(null);
   const containerRef = useRef(null);
-  const progressRef = useRef(0);
-  const readyRef = useRef(ready);
   const exitStarted = useRef(false);
 
   useEffect(() => {
-    readyRef.current = ready;
-  }, [ready]);
-
-  useEffect(() => {
-    const startedAt = performance.now();
     const points = buildTearPoints();
+    const startedAt = performance.now();
     let raf = 0;
 
     const tick = () => {
       const elapsed = performance.now() - startedAt;
-      const target = readyRef.current
-        ? 100
-        : Math.min(90, 20 + (elapsed / 8000) * 70);
+      const value = Math.min(100, Math.round((elapsed / 1800) * 100));
+      setProgress(value);
 
-      progressRef.current += (target - progressRef.current) * 0.08;
-      if (Math.abs(target - progressRef.current) < 0.15) {
-        progressRef.current = target;
-      }
-      setProgress(Math.round(progressRef.current));
-
-      // Never allow the loader to deadlock. If the scene is still mounting
-      // after 10 seconds, reveal it anyway rather than trapping the visitor.
-      if (!exitStarted.current && (readyRef.current || elapsed > 10000)) {
+      // The loader must never depend on a 3D asset, WebGL event, or
+      // scene-ready callback. The scene can continue loading underneath it.
+      if (!exitStarted.current && elapsed >= 1800) {
         exitStarted.current = true;
         const tl = gsap.timeline({
           onComplete: () => {
@@ -52,24 +39,23 @@ const Preloader = ({ onComplete, ready }) => {
           },
         });
 
-        tl.to({}, { duration: 0.2 });
+        tl.to({}, { duration: 0.15 });
         tl.to(leftRef.current, {
           xPercent: -100,
           rotation: -2,
-          duration: 1.5,
+          duration: 1.15,
           ease: 'power3.inOut',
         }, 'tear');
         tl.to(rightRef.current, {
           xPercent: 100,
           rotation: 2,
-          duration: 1.5,
+          duration: 1.15,
           ease: 'power3.inOut',
         }, 'tear');
         tl.to(containerRef.current, {
           opacity: 0,
-          duration: 0.35,
-        }, '-=0.35');
-        cancelAnimationFrame(raf);
+          duration: 0.25,
+        }, '-=0.25');
         return;
       }
 
@@ -82,9 +68,10 @@ const Preloader = ({ onComplete, ready }) => {
 
   if (done) return null;
 
-  const tearPath = pointsToPath(buildTearPoints());
-  const leftClip = pointsToClip(pointsToPathPoints(tearPath), 'left');
-  const rightClip = pointsToClip(pointsToPathPoints(tearPath), 'right');
+  const tearPath = pointsToPath(points);
+  const tearPoints = pointsToPathPoints(tearPath);
+  const leftClip = pointsToClip(tearPoints, 'left');
+  const rightClip = pointsToClip(tearPoints, 'right');
 
   return (
     <div className="preloader" ref={containerRef}>
@@ -116,7 +103,12 @@ function pointsToPathPoints(path) {
 }
 
 function pointsToClip(points, side) {
-  if (!points.length) return side === 'left' ? 'polygon(0 0, 0 100%, 50% 100%, 50% 0)' : 'polygon(50% 0, 50% 100%, 100% 100%, 100% 0)';
+  if (!points.length) {
+    return side === 'left'
+      ? 'polygon(0 0, 0 100%, 50% 100%, 50% 0)'
+      : 'polygon(50% 0, 50% 100%, 100% 100%, 100% 0)';
+  }
+
   const edge = points.map(([x, y]) => `${x}% ${y}%`).join(', ');
   if (side === 'left') return `polygon(0% 0%, ${edge}, 0% 100%)`;
   return `polygon(100% 0%, 100% 100%, ${[...points].reverse().map(([x, y]) => `${x}% ${y}%`).join(', ')})`;
