@@ -13,13 +13,13 @@ const buildTearPoints = () => {
 const Preloader = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
+  const [points] = useState(buildTearPoints);
   const leftRef = useRef(null);
   const rightRef = useRef(null);
   const containerRef = useRef(null);
   const exitStarted = useRef(false);
 
   useEffect(() => {
-    const points = buildTearPoints();
     const startedAt = performance.now();
     let raf = 0;
 
