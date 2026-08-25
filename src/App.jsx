@@ -65,10 +65,23 @@ function DocumentMetaBridge() {
 function AppContent() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
+  const [showCharacter, setShowCharacter] = useState(true);
   const { settings, downgradeTier, tier } = usePerformance();
 
   useEffect(() => {
     initAudio();
+  }, []);
+
+  // The character is an entrance greeting. It disappears when the visitor
+  // starts exploring by clicking/tapping the scene.
+  useEffect(() => {
+    const hideCharacter = () => setShowCharacter(false);
+    window.addEventListener('click', hideCharacter, { once: true });
+    window.addEventListener('touchstart', hideCharacter, { once: true });
+    return () => {
+      window.removeEventListener('click', hideCharacter);
+      window.removeEventListener('touchstart', hideCharacter);
+    };
   }, []);
 
   const handleSceneReady = useCallback(() => {
@@ -114,6 +127,28 @@ function AppContent() {
               </Suspense>
             </Canvas>
           </div>
+
+          {isLoaded && showCharacter && (
+            <div
+              aria-label="A. Tamilarasan"
+              style={{
+                position: 'fixed',
+                left: '7%',
+                bottom: '10%',
+                width: 'clamp(100px, 15vw, 220px)',
+                zIndex: 20,
+                pointerEvents: 'none',
+                filter: 'drop-shadow(0 8px 10px rgba(0,0,0,0.12))',
+                animation: 'tamilarasanEntrance 900ms ease-out both',
+              }}
+            >
+              <img
+                src="/images/tamilarasan-character.webp"
+                alt="A. Tamilarasan giving a thumbs-up"
+                style={{ width: '100%', height: 'auto', display: 'block' }}
+              />
+            </div>
+          )}
 
           {isLoaded && (
             <>
