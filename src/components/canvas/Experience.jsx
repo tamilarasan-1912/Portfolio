@@ -7,6 +7,7 @@ import EmptyCorridor from './entrance/EmptyCorridor';
 import TeleportRoom from './corridor/TeleportRoom';
 import useInfiniteCamera from '../../hooks/useInfiniteCamera';
 import SignSystem from './entrance/SignSystem';
+import TamilarasanCharacter from './entrance/TamilarasanCharacter';
 import { useScene } from '../../context/SceneContext';
 
 const ENTRANCE_DOORS_Z = 22;
@@ -37,10 +38,6 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
         parallaxEnabled: hasEntered && !isTeleporting && !isInRoom,
     });
 
-    // Signal readiness after the Experience has actually mounted.
-    // Previously this waited for isLoaded, while isLoaded itself depended on
-    // the preloader completing, creating a circular dependency that left the
-    // production site permanently stuck at 90%.
     useEffect(() => {
         const frame = requestAnimationFrame(() => {
             onSceneReady?.();
@@ -68,7 +65,10 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
             )}
 
             {!hasEntered && (
-                <SignSystem position={[0, 0, ENTRANCE_DOORS_Z]} />
+                <>
+                    <SignSystem position={[0, 0, ENTRANCE_DOORS_Z]} />
+                    <TamilarasanCharacter position={[-4.2, 0.3, ENTRANCE_DOORS_Z + 0.42]} />
+                </>
             )}
 
             <InfiniteCorridorManager
